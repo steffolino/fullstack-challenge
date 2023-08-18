@@ -2,24 +2,29 @@ import { Avatar, Box, Button, chakra, Flex, Stack, Text } from "@chakra-ui/react
 import { Project } from "../../interfaces/project.interface"
 import { FaLeaf } from "react-icons/fa"
 import { MdModeEditOutline } from "react-icons/md"
-import { BsFillTrashFill } from "react-icons/bs"
+import { BsFillTrashFill, BsArrowCounterclockwise } from "react-icons/bs"
 import TimeAgo from 'react-timeago'
 import DeleteProjectConfirmation from "../DeleteProjectConfirmation"
+import ActivateProjectConfirmation from "../ActivateProjectConfirmation"
 import { useContext, useState } from "react"
 import { translate } from "../../utils/language.utils"
 import { useNavigate } from "react-router"
 import { AuthContext } from "../../context/auth"
 
 interface Props {
-    project: Project
-    onDelete: (projectId: string) => void
+    project: Project,
+    onDelete: (projectId: string) => void,
+    onActivate: (projectId: string) => void,
+    isArchive: boolean
 }
 
 const LeafIcon = chakra(FaLeaf)
 const TimeAgeComponent = chakra(TimeAgo)
-
-export default function ProjectItem({ project, onDelete }: Props) {
+//cf. https://react-icons.github.io/react-icons/icons?name=bs
+//@TODO: translate icon titles
+export default function ProjectItem({ project, onDelete, onActivate, isArchive }: Props) {
     const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false)
+    const [isActivateConfirmationOpen, setIsActivateConfirmationOpen] = useState(false)
     const navigate = useNavigate()
     const { context } = useContext(AuthContext)
     const userEmail = context?.user?.email
@@ -27,6 +32,11 @@ export default function ProjectItem({ project, onDelete }: Props) {
     const onDeleteAction = () => {
         setIsDeleteConfirmationOpen(false)
         onDelete(project.id)
+    }
+
+    const onActivateAction = () => {
+        //setIsDeleteConfirmationOpen(false)
+        onActivate(project.id)
     }
 
     return (
@@ -45,8 +55,9 @@ export default function ProjectItem({ project, onDelete }: Props) {
                     <Text fontWeight='bold'>{project.name}</Text>
                     {userEmail === project.owner && (
                         <Flex gap={3}>
-                            <MdModeEditOutline cursor='pointer' onClick={() => navigate(`/projects/${project.id}/edit`)} />
-                            <BsFillTrashFill cursor='pointer' onClick={() => setIsDeleteConfirmationOpen(true)} />
+                            <MdModeEditOutline cursor='pointer' title="edit" onClick={() => navigate(`/projects/${project.id}/edit`)} />
+                                <BsArrowCounterclockwise title="activate" className={isArchive?'':'hidden'} cursor='pointer' onClick={() => setIsActivateConfirmationOpen(true)} />
+                                <BsFillTrashFill title="delete"  className={isArchive?'hidden':''} cursor='pointer' onClick={() => setIsDeleteConfirmationOpen(true)} />
                         </Flex>
                     )}
                 </Flex>
@@ -74,6 +85,11 @@ export default function ProjectItem({ project, onDelete }: Props) {
                 isOpen={isDeleteConfirmationOpen}
                 onClose={() => setIsDeleteConfirmationOpen(false)}
                 onDelete={onDeleteAction}
+            />
+            <ActivateProjectConfirmation
+                isOpen={isActivateConfirmationOpen}
+                onClose={() => setIsActivateConfirmationOpen(false)}
+                onActivate={onActivateAction}
             />
         </Box>
     )

@@ -7,7 +7,9 @@ class UserService {
     }
 
     public async login(user: UserRegistrationDTO) {
+        debugger;
         return  HTTPService.post<UserLoginDTO>('auth/login', user);
+
     }
 
 }

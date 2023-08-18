@@ -20,6 +20,7 @@ export class Project {
   @Column('simple-array')
   co2EstimateReduction: number[];
 
+  /*not mapped to frontend*/
   @Column({ default: true })
   isActive: boolean;
 

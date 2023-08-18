@@ -7,6 +7,7 @@ export interface Project {
     listing: string[]
     createdAt: string;
     updatedAt: string;
+    isActive: boolean;
 }
 
 export interface ListItem {

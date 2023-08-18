@@ -4,7 +4,11 @@ import { translate } from "../../utils/language.utils"
 import { TbMoodEmpty } from "react-icons/tb"
 import { useNavigate } from "react-router"
 
-export const ProjectsEmptyState = () => {
+interface Props {
+    isArchive: boolean
+}
+
+export const ProjectsEmptyState = ({isArchive}: Props) => {
     const navigate = useNavigate()
 
     return (
@@ -15,11 +19,11 @@ export const ProjectsEmptyState = () => {
             justifyContent={'center'}
             flexDirection='column'>
             <TbMoodEmpty size={60} />
-            <Heading size='lg' textAlign='center'>{translate('NO_PROJECTS_TITLE')}</Heading>
+            <Heading size='lg' textAlign='center'>{isArchive? translate('NO_PROJECTS_IN_ARCHIVE_TITLE'):translate('NO_PROJECTS_TITLE')}</Heading>
             <Text>
-                {translate('NO_PROJECTS_DESCRIPTION')}
+                {isArchive? '':translate('NO_PROJECTS_DESCRIPTION')}
             </Text>
-            <Button
+            <Button className={isArchive?"hidden":""}
                 onClick={() => navigate('/projects/create')}
             >
                 {translate('CREATE_PROJECT')}

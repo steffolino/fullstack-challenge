@@ -7,14 +7,16 @@ import { translate } from "../../utils/language.utils";
 import ProjectItem from "./ProjectItem";
 import { useNavigate } from "react-router";
 
-export default function ProjectsList() {
+
+/* improvement: combine with projectlist component with parameter isActive  */
+export default function ProjectsArchive() {
     const [projectList, setProjectList] = useState<Project[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const navigate = useNavigate()
     const toast = useToast();
 
     const fetchProjects = useCallback(async () => {
-        const projects = await ProjectsService.fetchActiveProjects()
+        const projects = await ProjectsService.fetchInactiveProjects()
         if (projects && projects?.length !== 0) {
             setProjectList(projects)
         }
@@ -70,13 +72,13 @@ export default function ProjectsList() {
 
 
     if (projectList.length === 0 && !isLoading) {
-        return <ProjectsEmptyState isArchive={false}/>
+        return <ProjectsEmptyState isArchive={true} />
     }
 
     return (
         <Stack spacing={8}>
             {projectList?.map(project => (
-                <ProjectItem key={project.id} project={project} onDelete={onDelete} onActivate={onActivate} isArchive={false} />
+                <ProjectItem key={project.id} project={project} onActivate={onActivate} onDelete={onDelete} isArchive={true} />
             ))
             }
             <Flex gap={2} justifyContent='center'>

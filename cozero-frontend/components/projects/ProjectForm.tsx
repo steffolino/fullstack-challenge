@@ -12,8 +12,12 @@ import { ProjectInformation } from "../../enums/projectInformation.enum";
 import { getProjectResponseTranslation, projectFormToProjectDTO } from "../../utils/project.utils";
 import { useNavigate, useParams } from "react-router";
 import { AuthContext } from "../../context/auth";
+import { useRef } from "react";
+
+import { debug } from "console";
 
 export default function ProjectForm() {
+    const inputRef = useRef<HTMLInputElement>(null);
     const { id } = useParams()
     const [listItem, setListItem] = useState<string>("");
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -23,7 +27,6 @@ export default function ProjectForm() {
         defaultValues: createProjectDefaultValues
     })
     const { context } = useContext(AuthContext)
-
     const { append, remove } = useFieldArray({
         control,
         name: "listing",
@@ -70,26 +73,49 @@ export default function ProjectForm() {
         }
     }
 
+    //check again for user logged in? --> show/hide create btn + navigate
+    //update search datasource after submit -- useEffect()?
     const onSubmitForm = async (projectForm: IProjectForm) => {
         setIsProcessing(true);
 
-        const project: CreateProjectDto | UpdateProjectDto = projectFormToProjectDTO(projectForm, context?.user?.email as string)
+        if(projectForm.listing.length > 0) {
+            const project: CreateProjectDto | UpdateProjectDto = projectFormToProjectDTO(projectForm, context?.user?.email as string)
 
-        const projectResponse = id ? await ProjectsService.updateProject(project as UpdateProjectDto) : await ProjectsService.createProject(project as CreateProjectDto);
-        setIsProcessing(false);
-
-        const { title, description } = getProjectResponseTranslation(!!projectResponse, !!id);
-
-        toast({
-            title,
-            description,
-            status: projectResponse ? 'success' : 'error',
-            duration: 9000,
-            isClosable: true,
-        })
-
-        if (projectResponse) {
-            navigate("/projects")
+            const projectResponse = id ? await ProjectsService.updateProject(project as UpdateProjectDto) : await ProjectsService.createProject(project as CreateProjectDto);
+            setIsProcessing(false);
+    
+            const { title, description } = getProjectResponseTranslation(!!projectResponse, !!id);
+    
+            toast({
+                title,
+                description,
+                status: projectResponse ? 'success' : 'error',
+                duration: 9000,
+                isClosable: true,
+            })
+    
+            if (projectResponse) {
+                navigate("/projects")
+            }
+        } else {
+            let title:string = translate('PROJECT_REQ_ERR_TITLE');
+            let description:string = translate('PROJECT_REQ_ERR_DESC');
+            toast({
+                title,
+                description,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            });
+            setIsProcessing(false);
+            
+            try 
+            {
+                inputRef?.current?.focus();
+            }
+            catch (exc) {
+                console.error(exc);
+            }
         }
     }
 
@@ -137,6 +163,7 @@ export default function ProjectForm() {
                     <FormLabel>{translate('LISTING_PROPOSALS')}</FormLabel>
                     <Input type='text'
                         id='listing-proposal-input'
+                        ref={inputRef}
                         value={listItem}
                         onChange={(e) => setListItem(e.target.value)}
                         onKeyDown={onKeyDown}
@@ -154,7 +181,6 @@ export default function ProjectForm() {
                         </ListItem>
                     ))}
                 </List>
-
                 <Button colorScheme='green' type='submit' isLoading={isProcessing}>
                     {translate(id ? 'UPDATE' : 'CREATE')} {translate('PROJECT')}
                 </Button>

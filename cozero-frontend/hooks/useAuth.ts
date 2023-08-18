@@ -11,12 +11,22 @@ export const useAuth = () => {
     const navigate = useNavigate()
 
     const signIn = async (user: UserRegistrationDTO) => {
-        const loggedUser = await UserService.login(user);
+        
+        /*
+        message: "Unauthorized"
+        statusCode: 401
+        */
+        const loggedUser:UserLoginDTO | undefined = await UserService.login(user);
+
+        debugger;
         setContext({
             ...context,
             user: loggedUser
         })
         LocalStorageService.setItem("user", loggedUser);
+
+        //doesnt check for unauthorized msg when jwt undefined
+        //{"statusCode":401,"message":"Unauthorized"}	
         if (loggedUser) {
             navigate('/')
             return;

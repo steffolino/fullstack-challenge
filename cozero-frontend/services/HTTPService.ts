@@ -16,6 +16,7 @@ class HTTPService {
         }
     }
 
+    //jwtToken undefined?
     public async post<T>(path: string, data: any, jwtToken?: string): Promise<T | undefined> {
         try {
             const response = await fetch(`${BACKEND_URL}/${path}`, {
@@ -54,6 +55,19 @@ class HTTPService {
         });
         return response.json();
     }
+
+    public async archive<T>(path: string, jwtToken?: string): Promise<T> {
+        const response = await fetch(`${BACKEND_URL}/${path}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': jwtToken ? `Bearer ${jwtToken}` : '',
+            },
+        });
+        return response.json();
+    }
+
+
 }
 
 export default new HTTPService();

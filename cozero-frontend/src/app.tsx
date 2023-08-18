@@ -1,11 +1,12 @@
 import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+//import type { AppProps } from 'next/app'
 import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from '../configs/theme'
 import Layout from '../layouts/Layout'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Home from '.'
 import ProjectsList from "../components/projects/ProjectsList"
+import ProjectsArchive from "../components/projects/ProjectsArchive"
 import LoginPage from './login'
 import CreateProjectPage from './projects/create'
 import { ProjectViewPage } from './projects/view'
@@ -20,6 +21,7 @@ function App() {
     setContext
   }
 
+  //make routes only available to loggedin users? eg. createproject, projectsarchive
   return (
     <AuthContext.Provider value={contextValue}>
       <ChakraProvider theme={theme}>
@@ -28,6 +30,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/projects" element={<ProjectsList />} />
+              <Route path="/projectsarchive" element={<ProjectsArchive />} />
               <Route path='/sign-up' element={<LoginPage isSignUp={true} />} />
               <Route path='/sign-in' element={<LoginPage isSignUp={false} />} />
               <Route path='/projects/create' element={<CreateProjectPage />} />
